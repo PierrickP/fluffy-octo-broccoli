@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script type="text/javascript" src="./node_modules/hellojs/dist/hello.all.min.js"></script>
+  <script type="text/javascript" src="./node_modules/github-api/dist/GitHub.bundle.js"></script>
+</head>
+<body>
+  <button onclick="login()">login</button>
+
+  Token: <span id="token"></span>
+
+  <form onsubmit="createIssue(); return false;">
+    <textarea name="issue"></textarea>
+    <input type="submit" name="submit" value="Create">
+  </form>
+
+  <script type="text/javascript">
+    const tokenEl = document.querySelector('#token');
+    const issueEl = document.querySelector('[name="issue"]');
+
+    function login() {
+      return hello('github').login();
+    }
+
+    function createIssue(e) {
+      var gh = new GitHub({
+        token: tokenEl.textContent
+      });
+
+      console.log(gh.getUser())
+
+      var remoteIssues = gh.getIssues('PierrickP', 'fluffy-octo-broccoli');
+      remoteIssues.createIssue({
+         title: `Test issue ${Math.round(Math.random() * 10000)}`,
+         body: issueEl.value,
+      });
+    }
+
+    hello.init({
+      github: 'Iv1.c13e7b19e913ffeb'
+    }, {
+      redirect_uri: 'http://127.0.0.1:8000'
+    });
+
+    hello.on('auth.login', () => {
+      const auth = hello('github').getAuthResponse();
+      console.log(auth);
+      tokenEl.textContent = auth.access_token;
+    });
+  </script>
+</body>
+</html>
